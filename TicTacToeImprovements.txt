@@ -1,0 +1,61 @@
+
+First Turn Improvements:
+----------------------------
+
+*If the player starts in the center: the Ai will only choose either the top left corner or the top center board piece.
+*If the player starts in a corner: the AI will ignore 3 edge pieces in an L shape depending on the corner position.
+	- Top Left/ Bottom Right Corner = Ignore Top Right L pieces.
+	- Top Right/ Bottom Left Corner = Ignore Bottom Right L pieces.
+
+	
+	
+Symmetry Optimizations:
+----------------------------
+
+*If the 1st and 3rd column contain the exact same values, the AI will ignore the 3rd column.
+*If the 1st and 3rd row contain the exact same values, the AI will ignore the 3rd row.
+*If you treat a forward digaonal or a backward diagonal as a symmetry line, the L pieces at opposite ends
+can be treated as mirrored results since rotating theobard 180 degrees will give the same result.
+	
+	- ex: (the L shapes on both ends of the forward digonal match, therefore one L can be ignored)
+		| 2 | 1 | 0 |
+		| 1 | 0 | 1 |
+		| 0 | 1 | 2 |
+
+This helps the AI run much more efficiently.
+
+
+
+Stored Hashmaps Optimizations:
+-------------------------------
+Whenever the AI discovers the best possible move to make on its turn, it will create an answer key for a hashmap.
+
+The answer key is the order of all board values (0 = empty, 1 = player, 2 = AI) with the winning index being at the very end.
+The answer key is always 10 digits long since the first 9 values are only combinations of 0,1,2 and the winning index will
+always be a number from 0 to 8.
+
+EX: 0101012028
+
+Whenever the AI needs to make a move on its turn, it will attempt to check if the hashmap already contains the answer
+for the current board combination. If so, no min/max checking is necessary.
+
+At the end of the program, the entire contents of the hashmap are stored in a text file.
+At the start of the program, the entire text file is read into the hashmap.
+
+This significantly improves the AI speed. 
+
+
+Monkey Input Bonus:
+---------------------
+
+In order to help creating all possible combinations for the storage optimization,
+I created a mode called MonkeyMode that attempts to virtualy input all different possible player choices in tic tac toe.
+It has 5 integers for indices and every game completed it increases the first number. When a number surpasses the index limit,
+it resets to zero and increases the next number (similar to a counter). It also ignores duplicate indices since a player
+cannot place his/her pieces on the board twice in the same spot. If it attempts to put a piece that's already occupied,
+it simlply looks to the nearest available slot instead.
+
+This way I could leave the game running for approximately an hour in monkeymode and
+then come back with the hashmap optimization having created all possible combinations for the AI.
+
+(it was also useful for stress testing any possibilities of winning in tic-tac-toe).
